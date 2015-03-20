@@ -9,17 +9,18 @@ typedef unsigned int uint;
 
 using namespace std;
 
-int table[100][100];
+vector<list<int>> graph;
+set<int> nodes;
 bool visited[100];
 
 int solve(int start, int dist) {
   int res = -1;
-  rep(i, 100) {
-    if(visited[i] || table[start][i] == 0) continue;
+  for(int to : graph[start]) {
+    if(visited[to]) continue;
 
-    visited[i] = true;
-    res = max(res, solve(i, dist + 1));
-    visited[i] = false;
+    visited[to] = true;
+    res = max(res, solve(to, dist + 1));
+    visited[to] = false;
   }
   if(res == -1) return dist;
   return res;
@@ -31,31 +32,25 @@ int main() {
     cin >> n;
     if(n == 0) break;
 
-    memset(table, 0, 100 * 100 * sizeof(int));
+    graph.clear(); nodes.clear();
+    graph.resize(100);
     memset(visited, 0, 100 * sizeof(bool));
 
     rep(i, n) {
       int a, b;
       cin >> a >> b;
       a--; b--;
-      table[a][b] = table[b][a] = 1;
+      graph[a].push_back(b);
+      graph[b].push_back(a);
+      nodes.insert(a); nodes.insert(b);
     }
 
     int ans = 0;
 
-    rep(i, 100) {
-      bool indep = true;
-      rep(j, 100) {
-        if(table[i][j] != 0) {
-          indep = false;
-          break;
-        }
-      }
-      if(indep) continue;
-
-      visited[i] = true;
-      ans = max(solve(i, 0), ans);
-      visited[i] = false;
+    for(int node : nodes) {
+      visited[node] = true;
+      ans = max(solve(node, 0), ans);
+      visited[node] = false;
     }
 
     cout << ans + 1 << endl;
