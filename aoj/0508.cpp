@@ -10,44 +10,29 @@ typedef unsigned int uint;
 using namespace std;
 
 int table[100][100];
+bool visited[100];
 
-int n;
+int solve(int start, int dist) {
+  int res = -1;
+  rep(i, 100) {
+    if(visited[i] || table[start][i] == 0) continue;
 
-int solve(int start) {
-  stack<tuple<int, set<int>, int>> que; //current_pos, history, distance
-  que.push(make_tuple(start, set<int>(), 0));
-
-  int max_dist = -1;
-  while(!que.empty()) {
-    auto a = que.top(); //que.front();
-    que.pop();
-
-    auto cur_pos  = get<0>(a);
-    auto &history = get<1>(a);
-    auto dist     = get<2>(a);
-
-    int push_num = 0;
-    rep(i, 100) {
-      if(table[cur_pos][i] == 0 || history.find(i) != history.end()) continue;
-
-      auto new_hist = history;
-      new_hist.insert(cur_pos);
-
-      que.push(make_tuple(i, new_hist, dist + 1));
-      push_num++;
-    }
-    if(push_num == 0) max_dist = max(max_dist, dist);
+    visited[i] = true;
+    res = max(res, solve(i, dist + 1));
+    visited[i] = false;
   }
-
-  return max_dist;
+  if(res == -1) return dist;
+  return res;
 }
 
 int main() {
   while(true) {
+    int n;
     cin >> n;
     if(n == 0) break;
 
     memset(table, 0, 100 * 100 * sizeof(int));
+    memset(visited, 0, 100 * sizeof(bool));
 
     rep(i, n) {
       int a, b;
@@ -68,7 +53,9 @@ int main() {
       }
       if(indep) continue;
 
-      ans = max(solve(i), ans);
+      visited[i] = true;
+      ans = max(solve(i, 0), ans);
+      visited[i] = false;
     }
 
     cout << ans + 1 << endl;
