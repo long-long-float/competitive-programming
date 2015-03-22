@@ -26,36 +26,25 @@ int main() {
   vector<int> ans;
   ans.push_back(0);
 
-  set<int> targets, history;
+  set<int> history;
+  history.insert(0);
+  priority_queue<int, vector<int>, greater<int>> targets;
   queue<int> que;
   que.push(0);
   while(!que.empty()) {
     int cur = que.front();
     que.pop();
 
-    if(history.find(cur) != history.end()) continue;
-    history.insert(cur);
-    //cout << cur + 1 << endl;
-
     for(int dist : nodes[cur]) {
       if(history.find(dist) != history.end()) continue;
-      targets.insert(dist);
+      history.insert(dist);
+      targets.push(dist);
     }
 
-    /*cout << cur+1 << " targets: ";
-    for(int e : targets) {
-      cout << e+1 << ' ';
-    }*/
-
     if(!targets.empty()) {
-      int min_dist = INT_MAX;
-      for(int t : targets) {
-        min_dist = min(min_dist, t);
-      }
+      int min_dist = targets.top();
+      targets.pop();
 
-      //cout << " pushed: " << min_dist+1 << endl;
-
-      targets.erase(min_dist);
       ans.push_back(min_dist);
       que.push(min_dist);
     }
