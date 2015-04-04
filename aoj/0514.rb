@@ -3,21 +3,34 @@ while true
   break if a == 0 and b == 0 and c == 0
 
   n = gets.to_i
-  fail_lists = []
+  orig_fail_lists = []
+  succeeded_lists = []
   n.times do
     i, j, k, r = gets.split.map(&:to_i)
     if r == 0
-      fail_lists << [i, j, k]
+      orig_fail_lists << [i, j, k]
     else
-      fail_lists.each do |fail_list|
-        fail_list.delete(i)
-        fail_list.delete(j)
-        fail_list.delete(k)
-      end
+      succeeded_lists << i << j << k
     end
   end
 
+  fail_lists = orig_fail_lists.dup
+  orig_fail_lists = orig_fail_lists.flatten.uniq
+
+  succeeded_lists.uniq.each do |no|
+    fail_lists.each do |fail_list|
+      fail_list.delete(no)
+    end
+  end
+
+  #pp fail_lists, orig_fail_lists
+
   1.upto(a + b + c) do |i|
+    unless orig_fail_lists.include?(i)
+      puts 2
+      next
+    end
+
     failed = false
     may_be_failed = false
     fail_lists.each do |fail_list|
@@ -30,12 +43,13 @@ while true
         end
       end
     end
-    if may_be_failed
-      puts 2
-    elsif failed
+    if failed
       puts 0
+    elsif may_be_failed
+      puts 2
     else
       puts 1
     end
   end
+
 end
